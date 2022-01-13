@@ -1,0 +1,77 @@
+This example demonstrates how to respond with HTML files saved in the local storage.
+
+<strong>app.js</strong>
+<pre class="EnlighterJSRAW" data-enlighter-language="null">// http module to handle the http requests
+let http = require('http');
+//fs (file system) to read data from the local storage 
+let fs = require('fs');
+
+http.createServer(function (req, res) {
+    let fileName = '';
+    console.log(req.url);
+    switch (req.url) {
+        case '/': // http://localhost:8080
+            fileName = './index.html';
+            break;
+        case '/about': //http://localhost:8080/about
+            fileName = './about.html';
+            break;
+        case '/contact': ////http://localhost:8080/contact
+            fileName = './contactus.html';
+            break;
+        default: //if any other request arrives, just ignore
+            return;
+    }
+    //now lets read the file
+    fs.readFile(fileName, function (error, content) {
+        res.writeHead(200); // Everything is OK
+        res.write(content); // send the content of the file
+        res.end(); // Done
+    })
+}).listen(8080); // the server is listening</pre>
+&nbsp;
+
+<strong>index.html</strong>
+<pre class="EnlighterJSRAW" data-enlighter-language="html">&lt;html&gt;
+&lt;body&gt;
+    &lt;h1&gt;Welcome to the Homepage&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+&nbsp;
+
+<strong>about.html</strong>
+<pre class="EnlighterJSRAW" data-enlighter-language="html">&lt;html&gt;
+&lt;body&gt;
+    &lt;h1&gt;About page!!!&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+&nbsp;
+
+<strong>contactus.html</strong>
+<pre class="EnlighterJSRAW" data-enlighter-language="html">&lt;html&gt;\
+&lt;body&gt;
+    &lt;h1&gt;Email &amp;&amp; Phone&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+&nbsp;
+
+&nbsp;
+<div class="square-box">
+
+The server serves three routes, which are:
+<ul>
+ 	<li>homepage: http://localhost:8080</li>
+ 	<li>About Page: http://localhost:8080/about</li>
+ 	<li>Contact Us Page: http://localhost:8080/contact</li>
+</ul>
+</div>
+&nbsp;
+<div class="square-box">
+
+IMPORTANT:
+<ul>
+ 	<li>Lines 21-25 are responsible for reading the local files</li>
+ 	<li>the callback function in line 21 will be called once the read operation finishes.</li>
+</ul>
+</div>
+&nbsp;

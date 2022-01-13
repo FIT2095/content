@@ -1,0 +1,133 @@
+&nbsp;
+<div class="square-box">
+
+Question: is it possible to rename a file, create a directory, or even copy set of files in Node.js
+
+Answer: YES!!! using the <strong>fs</strong> built-in module
+
+</div>
+&nbsp;
+
+The Node.js file system module allows you to work with the file system on your computer.
+
+&nbsp;
+
+But how to add the fs module to my application??
+<pre class="EnlighterJSRAW" data-enlighter-language="null">let fs = require('fs');</pre>
+&nbsp;
+<h3>Read Files Asynchronously</h3>
+<pre class="EnlighterJSRAW" data-enlighter-language="js">let fs = require('fs')
+
+// this is the file name
+let fileName = './data.txt';
+
+//readFile is the function that reads yoru file
+// utf8 because the file is text
+fs.readFile(fileName, 'utf8', function (error, content) { 
+    // if an error occurs, parameter error will get a value 
+    if (error)
+        console.log('We got an error!!!' + error);
+    else {
+        console.log('the content is:');
+        console.log(content);
+    }
+
+})</pre>
+&nbsp;
+<h3>Read Files Synchronously</h3>
+<pre class="EnlighterJSRAW" data-enlighter-language="js">let content = fs.readFileSync(fileName).toString();
+console.log(content);
+</pre>
+In this fragment, <strong>content</strong> will be set to the contents of the file, and no JavaScript code will be executed while the file is being read.
+
+&nbsp;
+<h3>Create a Directory (Folder)</h3>
+<pre class="EnlighterJSRAW" data-enlighter-language="null">fs.mkdir('testDirName', function (error) {
+    if (error)
+        console.log('An error has just occurred' + error);
+    else {
+        console.log('Directory created successfully!');
+    }
+});
+</pre>
+&nbsp;
+<h3>Delete a Directory</h3>
+<pre class="EnlighterJSRAW" data-enlighter-language="js">fs.rmdir('testDirName', function (error) {
+    if (error)
+        console.log('An error has just occurred  ' + error);
+    else
+        console.log('Directory Deleted successfully!');
+})</pre>
+&nbsp;
+<h3>Create a file</h3>
+<pre class="EnlighterJSRAW" data-enlighter-language="null">fs.open('testFile.txt', 'w', function (error) {
+    if (error)
+        console.log('An error has just occurred  ' + error);
+})</pre>
+where
+<ul>
+ 	<li>'testFile.txt' is the name of the file to be created</li>
+ 	<li>'w': open for write</li>
+ 	<li>function: callback to be invoked after the open operation</li>
+</ul>
+&nbsp;
+<h3>Rename Files</h3>
+<pre class="EnlighterJSRAW" data-enlighter-language="null">fs.rename('testWrite.txt', 'myrenamedfile.txt', function (err) {
+    if (err) throw err;
+    console.log('File Renamed!');
+});</pre>
+&nbsp;
+<h3>Append to Files Asynchronously</h3>
+<pre class="EnlighterJSRAW" data-enlighter-language="null">for (let i = 0; i &lt; 10; i++) {
+    fs.appendFile('testWrite.txt', i + '\n', function (err) {
+        if (err) {
+            console.log('We got an error  ' + err);
+        }
+    })
+}</pre>
+The above code will be executed asynchronously.  Look at the content of testWrite.txt
+<pre class="EnlighterJSRAW" data-enlighter-language="null">0
+1
+3
+4
+5
+7
+8
+9
+2
+6
+</pre>
+&nbsp;
+
+&nbsp;
+<h3>Append to Files Synchronously</h3>
+<pre class="EnlighterJSRAW" data-enlighter-language="null">for (let i = 0; i &lt; 10; i++) {
+    fs.appendFileSync('testWrite2.txt', i + '\n');
+}</pre>
+&nbsp;
+
+testWrite2.txt
+<pre class="EnlighterJSRAW" data-enlighter-language="null">0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre>
+&nbsp;
+<div class="square-box">
+
+Question: Where is the full documentation of fs module??
+
+Answer: <a href="https://nodejs.org/api/fs.html">https://nodejs.org/api/fs.html</a>
+
+</div>
+&nbsp;
+
+&nbsp;
+
+&nbsp;

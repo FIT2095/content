@@ -1,0 +1,207 @@
+This application represents a simple Customers Management System.
+
+Using Node.js and Express, it implements the following concepts:
+<ul>
+ 	<li>GET and POST requests</li>
+ 	<li>Response.sendFile and relative pathnames</li>
+ 	<li>Response.render and the EJS engine</li>
+ 	<li>Static assets</li>
+</ul>
+&nbsp;
+
+Click <a href="https://www.alexandriarepository.org/wp-content/uploads/20210813001024/CustomersApp1.zip">HERE</a> to download the App in a ZIP format.
+
+&nbsp;
+
+app.js
+<pre class="EnlighterJSRAW" data-enlighter-language="js">let express = require("express");
+let app = express();
+
+//List of customers
+let db = [];
+
+// viewPath is required for the response.sendFile function
+//__dirname is the  directory name of the current module (i.e file/project).
+let viewsPath = __dirname + "/views/";
+
+/* Customer details
+    firstName,
+    lastName,
+    email,
+    phoneNumber
+ */
+
+//allow Express to understand the urlencoded format
+app.use(express.urlencoded({ extended: true }));
+
+// Express should be able to render ejs templates
+app.engine("html", require("ejs").renderFile);
+app.set("view engine", "html");
+
+// we have some static assets such as images in this project
+app.use(express.static("public/img"));
+app.use(express.static("public/css"));
+
+/* 
+          GET Requests
+  */
+//if a request to the home page (i.e. '/') arrives
+app.get("/", function (req, res) {
+  console.log("Homepage request");
+  // generate the relative path
+  let fileName = viewsPath + "index.html";
+  // send index.html back to the client
+  res.sendFile(fileName);
+});
+
+// a request to add a new customers
+app.get("/getaddcustomer", function (req, res) {
+  console.log("Add New Customer request");
+  //Generate the relative path
+  let fileName = viewsPath + "addcustomer.html";
+  //send addcusotmer.html page back to the client
+  res.sendFile(fileName);
+});
+
+//a request to get all customers
+app.get("/getallcustomers", function (req, res) {
+  console.log("Homepage request");
+  // the content of the page should be generated dynamically.
+  // a copy of the array (db) will be send to the rendering engine.
+  res.render("allcustomers", {
+    customers: db,
+  });
+});
+
+// POST Requests
+
+// when the user clicks on the submit button
+app.post("/postnewcustomer", function (req, res) {
+  console.log(req.body);
+  db.push(req.body);
+
+  // after pushing the new customer to the database, redirect the client to allcustomer.html
+  res.render("allcustomers", {
+    customers: db,
+  });
+});
+
+app.listen(8080);
+</pre>
+&nbsp;
+
+&nbsp;
+
+index.html
+<pre class="EnlighterJSRAW" data-enlighter-language="html">&lt;html&gt;
+&lt;body&gt;
+    &lt;img src="homepagelogo.jpg" width="400" height="100" /&gt;
+    &lt;h1&gt;Welcome to Customer Service App&lt;/h1&gt;
+    &lt;a href="/getaddcustomer"&gt;Add New Customer&lt;/a&gt; &lt;br&gt;
+    &lt;a href="/getallcustomers"&gt;List Customers&lt;/a&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+&nbsp;
+
+&nbsp;
+
+addcustomer.html
+<pre class="EnlighterJSRAW" data-enlighter-language="html">&lt;html&gt;
+  &lt;body&gt;
+    &lt;img src="homepagelogo.jpg" width="400" height="100" /&gt;
+    &lt;h1&gt;Enter new Customer:&lt;/h1&gt;
+    &lt;form action="postnewcustomer" method="POST"&gt;
+      First Name &lt;input type="text" name="firstName" /&gt; &lt;br /&gt;
+      Last Name &lt;input type="text" name="lastName" /&gt; &lt;br /&gt;
+      Email &lt;input type="text" name="email" /&gt;&lt;br /&gt;
+      Phone Number &lt;input type="text" name="phoneNumber" /&gt;&lt;br /&gt;
+      &lt;button&gt;Submit&lt;/button&gt;
+    &lt;/form&gt;
+    Click &lt;a href="/"&gt; HERE&lt;/a&gt; to return to home page!!
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+&nbsp;
+
+&nbsp;
+
+allcustomers.html
+<pre class="EnlighterJSRAW" data-enlighter-language="html">&lt;html&gt;
+&lt;head&gt;
+    &lt;link rel="stylesheet" href="customers.css"&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;table id="t01"&gt;
+        &lt;tr&gt;
+            &lt;th&gt;First Name&lt;/th&gt;
+            &lt;th&gt;Last Name&lt;/th&gt;
+            &lt;th&gt;Email&lt;/th&gt;
+            &lt;th&gt;Phone Number&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;% for(let i=0;i&lt;customers.length;i++){ %&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;%= customers[i].firstName %&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;%= customers[i].lastName %&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;%= customers[i].email %&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;%= customers[i].phoneNumber %&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;%} %&gt;
+    &lt;/table&gt;
+&lt;/body&gt;
+
+
+Click &lt;a href="/"&gt; HERE&lt;/a&gt; to return to home page!!
+
+&lt;/html&gt;</pre>
+&nbsp;
+
+&nbsp;
+
+customers.css
+<pre class="EnlighterJSRAW" data-enlighter-language="css">table {width: 100%;}
+table,th,td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th,td {
+    padding: 15px;
+    text-align: left;
+}
+table#t01 tr:nth-child(even) {
+    background-color: #eee;
+}
+table#t01 tr:nth-child(odd) {
+    background-color: #fff;
+}
+table#t01 th {
+    background-color: black;
+    color: white;
+}</pre>
+&nbsp;
+
+package.json
+<pre class="EnlighterJSRAW" data-enlighter-language="json">{
+  "name": "week4_tute_app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" &amp;&amp; exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.1"
+  }
+}
+</pre>
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;

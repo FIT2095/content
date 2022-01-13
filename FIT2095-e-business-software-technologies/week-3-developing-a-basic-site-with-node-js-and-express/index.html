@@ -1,0 +1,520 @@
+&nbsp;
+<div class="square-box">
+
+<strong>Question</strong>: I am building a web server using plain node.js but I have to repeat the same code over and over again. Is there a framework that saves our time and reduces the number of lines of code?
+
+<strong>Answer</strong>: YES!! Express.js
+
+</div>
+&nbsp;
+<h3>What is Express?</h3>
+<ul>
+ 	<li>Express (<a href="http://expressjs.com/">http://expressjs.com/</a>) is a web application framework for Node.js.</li>
+ 	<li> It provides all of the tools and basic building blocks you need to get a web server up and running by writing very little code.</li>
+ 	<li>It puts the power to focus on writing your app and not worry about the nuts and bolts that go into making the basic stuff work in your hands.</li>
+ 	<li>Express is like a toolbox. It has a lot of tools to do basic operations, allowing us to focus on the application's logic and content.</li>
+</ul>
+In general, most projects in Node.js perform two functions: run a server that listens on a specific port, and process incoming requests. Express is a wrapper for these two functionalities. The following is a basic code that runs the server:
+
+&nbsp;
+<pre class="EnlighterJSRAW" data-enlighter-language="null">let http = require('http');
+http.createServer(function (req, res) {
+  res.writeHead(200);
+  res.end('Hello World\n');
+}).listen(8080);</pre>
+&nbsp;
+
+This is an example extracted from the official documentation of Node.js. As shown, we use the native module <strong>http</strong> and run a server on the port <strong>8080</strong>. There is also a request handler function, which simply sends the <strong>Hello world</strong> string to the browser. Now, let's implement the same thing but with the Express framework, using the following code:
+
+&nbsp;
+<pre class="EnlighterJSRAW" data-enlighter-language="null">let express = require('express');
+let app = express();
+app.get("/", function(req, res, next) {
+  res.send("Hello world");
+}).listen(8080);</pre>
+&nbsp;
+
+They are almost the same, but, we don't need to:
+<ul>
+ 	<li>specify the response headers or</li>
+ 	<li>add a new line at the end of the string because the framework does it for us.</li>
+</ul>
+&nbsp;
+<div class="square-box">
+
+Develop a server that responds with the current time and date to requests with pathname '/time' and '/date' respectively.
+
+</div>
+&nbsp;
+<pre class="EnlighterJSRAW" data-enlighter-language="null">let express = require('express');
+let app = express();
+app.get('/', function (req, res) {
+    console.log('Hello World');
+    res.send('Hello World');
+});
+app.get('/time', function (req, res) {
+    let d = new Date();
+    let msg = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+    res.send(msg);
+});
+app.get('/date', function (req, res) {
+    let d = new Date();
+    let msg = d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear();
+    res.send(msg);
+});
+
+app.listen(8080);</pre>
+&nbsp;
+
+To run this app:
+<ul>
+ 	<li>open the folder that contains the JS file</li>
+ 	<li>open the integrated terminal</li>
+ 	<li>initialize the <strong>npm</strong> package by running this command in the terminal:</li>
+</ul>
+<pre class="EnlighterJSRAW" data-enlighter-language="null">npm init</pre>
+<ul>
+ 	<li>install the <strong>express</strong> package by:</li>
+</ul>
+<pre class="EnlighterJSRAW" data-enlighter-language="null">npm install express</pre>
+package.json
+<pre class="EnlighterJSRAW" data-enlighter-language="null">{
+  "name": "expressapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" &amp;&amp; exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
+</pre>
+now run your application:
+<pre class="EnlighterJSRAW" data-enlighter-language="null">node server.js</pre>
+&nbsp;
+
+To test your app, navigate to:
+<ul>
+ 	<li>http://localhost:8080</li>
+ 	<li>http://localhost:8080/time</li>
+ 	<li>http://localhost:8080/date</li>
+</ul>
+&nbsp;
+<div class="square-box">
+
+Develop an application that:
+<ul>
+ 	<li>has an array that works like a DB, and</li>
+ 	<li>accepts requests represent three DB operations
+<ul>
+ 	<li>'/list': the client needs the list of users  in the database</li>
+ 	<li>'/newuser': the client sends details of a new user through the URL to be inserted into the DB</li>
+ 	<li>'/deleteitem': the client sends through the URL the id (index) of a user to be deleted</li>
+ 	<li>'/': this is just the home page</li>
+</ul>
+</li>
+</ul>
+</div>
+&nbsp;
+
+Let's import the required packages:
+<pre class="EnlighterJSRAW" data-enlighter-language="null">let express = require('express');
+let url = require('url');
+</pre>
+&nbsp;
+
+create an instance of Express app:
+<pre class="EnlighterJSRAW" data-enlighter-language="null">let app = express();
+</pre>
+&nbsp;
+
+Define the database:
+<div>
+<div>
+<pre class="EnlighterJSRAW" data-enlighter-language="null">// Database is an array of records
+let db = [];</pre>
+</div>
+Insert an initial record:
+<pre class="EnlighterJSRAW" data-enlighter-language="null">//First record is an object contains the three attributes
+let rec = {
+    name: 'Tim',
+    age: 23,
+    address: 'Mel'
+};
+db.push(rec);</pre>
+listen to port 8080:
+<pre class="EnlighterJSRAW" data-enlighter-language="null">app.listen(8080);</pre>
+</div>
+&nbsp;
+
+<a name="generateString"></a>Build a function that generates a string contains the list of users:
+<pre class="EnlighterJSRAW" data-enlighter-language="null">function generateList() {
+    let st = 'Name  Age   Address  &lt;/br&gt;';
+    for (let i = 0; i &lt; db.length; i++) {
+        st += db[i].name + ' | ' + db[i].age + ' | ' + db[i].address + '&lt;/br&gt;';
+    }
+    return st;
+}</pre>
+&nbsp;
+
+listen to homepage requests (i.e. http://localhost:8080)
+<pre class="EnlighterJSRAW" data-enlighter-language="null">app.get('/', function (req, res) {
+    res.send('Hello from FIT2095');
+});</pre>
+&nbsp;
+
+listen to '/list' path that responds with a string has all the users in the DB
+<pre class="EnlighterJSRAW" data-enlighter-language="null">app.get('/list', function (req, res) {
+
+    res.send(generateList());
+});</pre>
+&nbsp;
+
+if the client wants to insert a new user to the DB, then he has to send a link like <span style="background-color: #999999;">http://localhost:8080/newuser?name=Max&amp;age=22&amp;address=ACT</span>, where the details of the new user can be found in the query string:
+<pre class="EnlighterJSRAW" data-enlighter-language="js">app.get("/newuser", function (req, res) {
+    let baseURL = "http://" + req.headers.host + "/";
+    let url = new URL(req.url, baseURL);
+    let params = url.searchParams;
+    console.log(params);
+
+    let newRec = {
+        name: params.get("name"),
+        age: params.get("age"),
+        address: params.get("address"),
+    };
+    db.push(newRec);
+    res.send(generateList());
+});</pre>
+&nbsp;
+
+<span style="text-decoration: underline;">Note: the callback responds with the updated list of users</span>
+
+&nbsp;
+
+to delete a user from the DB, the client has to send an id (index)  through the URL: <span style="background-color: #999999;">http://localhost:8080/delete?id=2</span>
+<pre class="EnlighterJSRAW" data-enlighter-language="js">app.get("/delete", function (req, res) {
+    let baseURL = "http://" + req.headers.host + "/";
+    let url = new URL(req.url, baseURL);
+    let params = url.searchParams;
+    console.log(params);
+    deleteUser(params.get("id"));
+    res.send(generateList());
+});</pre>
+&nbsp;
+
+<span style="text-decoration: underline;">Note: the callback responds with the updated list of users</span>
+
+&nbsp;
+
+Now let's put all the above fragments into one piece:
+<pre class="EnlighterJSRAW" data-enlighter-language="js">let express = require("express");
+let app = express();
+let url = require("url");
+// Database is an array of records
+let db = [];
+//First record is an object contains the three attributes
+let rec = {
+    name: "Tim",
+    age: 23,
+    address: "Mel",
+};
+//Insert the first record to the db
+db.push(rec);
+app.get("/", function (req, res) {
+    res.send("Hello from FIT2095");
+});
+app.get("/list", function (req, res) {
+    res.send(generateList());
+});
+app.get("/newuser", function (req, res) {
+    let baseURL = "http://" + req.headers.host + "/";
+    let url = new URL(req.url, baseURL);
+    let params = url.searchParams;
+    console.log(params);
+
+    let newRec = {
+        name: params.get("name"),
+        age: params.get("age"),
+        address: params.get("address"),
+    };
+    db.push(newRec);
+    res.send(generateList());
+});
+app.get("/delete", function (req, res) {
+    let baseURL = "http://" + req.headers.host + "/";
+    let url = new URL(req.url, baseURL);
+    let params = url.searchParams;
+    console.log(params);
+    deleteUser(params.get("id"));
+    res.send(generateList());
+});
+app.listen(8080);
+
+function deleteUser(id) {
+    db.splice(id, 1);
+}
+
+function generateList() {
+    let st = "Name  Age   Address  &lt;/br&gt;";
+    for (let i = 0; i &lt; db.length; i++) {
+        st += db[i].name + " | " + db[i].age + " | " + db[i].address + "&lt;/br&gt;";
+    }
+    return st;
+}</pre>
+&nbsp;
+
+&nbsp;
+
+To run, the above code:
+<ul>
+ 	<li>install express using 'npm install express --save' command</li>
+ 	<li>run the app using 'node server.js'</li>
+</ul>
+&nbsp;
+<h1><strong>Routing in Express.js</strong></h1>
+<ul>
+ 	<li>Route paths, in combination with a request method, define the endpoints at which requests can be made</li>
+ 	<li>Route paths can be strings, string patterns, or regular expressions</li>
+ 	<li>The characters ?, +, *, and () are subsets of their regular expression counterparts</li>
+ 	<li>The hyphen (-) and the dot (.) are interpreted literally by string-based paths</li>
+</ul>
+Examples:
+<ul>
+ 	<li>This route path will match requests to the root route, /.</li>
+</ul>
+<p style="padding-left: 60px;">URL: http://localhost:8080</p>
+
+<pre class="EnlighterJSRAW" style="padding-left: 60px;" data-enlighter-language="null">app.get('/', function (req, res) {
+  res.send('root')
+})</pre>
+<ul>
+ 	<li>This route path will match requests to /about.</li>
+</ul>
+<p style="padding-left: 60px;">URL:http://localhost:8080/about</p>
+
+<pre class="EnlighterJSRAW" style="padding-left: 60px;" data-enlighter-language="null">app.get('/about', function (req, res) {
+  res.send('about')
+})</pre>
+<ul>
+ 	<li>This route path will match requests to /random.text.</li>
+</ul>
+<p style="padding-left: 60px;">URL: http://localhost:8080/random.text</p>
+
+<pre class="EnlighterJSRAW" style="padding-left: 60px;" data-enlighter-language="null">app.get('/random.text', function (req, res) {
+  res.send('random.text')
+})</pre>
+&nbsp;
+<ul>
+ 	<li>Here are some examples of route paths based on string patterns. This route path will match acd and abcd.</li>
+</ul>
+<pre class="EnlighterJSRAW" style="padding-left: 60px;" data-enlighter-language="null">app.get('/ab?cd', function (req, res) {
+  res.send('ab?cd')
+})</pre>
+&nbsp;
+<ul>
+ 	<li>This route path will match abcd, abbcd, abbbcd, and so on</li>
+</ul>
+<pre class="EnlighterJSRAW" style="padding-left: 60px;" data-enlighter-language="null">app.get('/ab+cd', function (req, res) {
+  res.send('ab+cd')
+})</pre>
+&nbsp;
+<ul>
+ 	<li>This route path will match abcd, abxcd, abRANDOMcd, ab123cd, and so on.</li>
+</ul>
+<pre class="EnlighterJSRAW" style="padding-left: 60px;" data-enlighter-language="null">app.get('/ab*cd', function (req, res) {
+res.send('ab*cd')
+})</pre>
+&nbsp;
+<ul>
+ 	<li>This route path will match /abe and /abcde.</li>
+</ul>
+&nbsp;
+<pre class="EnlighterJSRAW" style="padding-left: 60px;" data-enlighter-language="null">app.get('/ab(cd)?e', function (req, res) {
+res.send('ab(cd)?e')
+})</pre>
+&nbsp;
+
+Examples of route paths based on regular expressions:
+<ul>
+ 	<li>This route path will match anything with an “a” in it.</li>
+</ul>
+<pre class="EnlighterJSRAW" style="padding-left: 60px;" data-enlighter-language="null">app.get(/a/, function (req, res) {
+res.send('/a/')
+})</pre>
+&nbsp;
+<ul>
+ 	<li>This route path will match butterfly and dragonfly, but not butterflyman, dragonflyman, and so on.</li>
+</ul>
+<pre class="EnlighterJSRAW" style="padding-left: 60px;" data-enlighter-language="null">app.get(/.*fly$/, function (req, res) {
+res.send('/.*fly$/')
+})</pre>
+&nbsp;
+
+&nbsp;
+<h1 id="route-parameters"><strong>Route parameters</strong></h1>
+Route parameters are named URL segments that are used to capture the values specified at their position in the URL.
+
+The captured values are populated in the req.params object, with the name of the route parameter specified in the path as their respective keys.
+<pre><code>Route path: /users/:userId/books/:bookId
+Request URL: http://localhost:3000/users/34/books/8989
+req.params: { "userId": "34", "bookId": "8989" }
+</code></pre>
+&nbsp;
+
+Now, let's reimplement the delete operation using the Express Route parameters.
+<div>
+<div>
+<pre class="EnlighterJSRAW" data-enlighter-language="null">app.get('/delete/:userId2Delete', function (req, res) {
+console.log(req.params);
+deleteUser(req.params.userId2Delete);
+res.send(generateList());
+})</pre>
+</div>
+</div>
+&nbsp;
+<h2>Query String in Express</h2>
+To get the list of query string parameters in a route, req.query can be used.
+
+For example, if you run this server:
+<pre class="EnlighterJSRAW" data-enlighter-language="null">let express = require('express');
+let app = express();
+
+app.listen(8080);
+app.get('/', function (req, res) {
+    console.log(req.query.name);
+    console.log(req.query.age);
+    console.log(req.query.address);
+
+});</pre>
+and you send this request:
+<pre class="EnlighterJSRAW" data-enlighter-language="null">http://localhost:8080/?name=Tim&amp;age=23&amp;address=Mel</pre>
+&nbsp;
+
+you will get this output:
+<pre class="EnlighterJSRAW" data-enlighter-language="null">Tim
+23
+Mel</pre>
+&nbsp;
+
+Now, lets update '/newuser' and '/delete' to use req.query
+<pre class="EnlighterJSRAW" data-enlighter-language="js">app.get("/newuser", function (req, res) {
+    // let baseURL = "http://" + req.headers.host + "/";
+    // let url = new URL(req.url, baseURL);
+    // let params = url.searchParams;
+    // console.log(params);
+
+    let newRec = {
+        name: req.query.name,
+        age: req.query.age,
+        address: req.query.address,
+    };
+    db.push(newRec);
+    res.send(generateList());
+});
+
+app.get("/delete", function (req, res) {
+    //   let baseURL = "http://" + req.headers.host + "/";
+    //   let url = new URL(req.url, baseURL);
+    //   let params = url.searchParams;
+    //   console.log(params);
+    deleteUser(req.query.id);
+    res.send(generateList());
+});</pre>
+&nbsp;
+
+&nbsp;
+<h2>Router-level middleware</h2>
+For the sake of separation of concerns (SoC) and maintainability, it is possible to separate the routes from the main js file using Express.Router.
+
+To demonstrate this, we need two JS files, router.js and server.js:
+<pre class="EnlighterJSRAW" data-enlighter-language="null">let express = require('express');
+let router = express.Router();
+
+router.get('/', function(req, res){
+   res.send('Welcome to FIT2095 Home Page');
+});
+router.get('/about', function(req, res){
+   res.send('This page is about FIT2095');
+});
+
+//export this router 
+module.exports = router;</pre>
+Now the server.js
+<pre class="EnlighterJSRAW" data-enlighter-language="null">let express = require('Express');
+let app = express();
+
+let router = require('./router.js');
+
+//both router.js and server.js should be in same directory
+app.use('/', router);
+
+app.listen(8080);</pre>
+&nbsp;
+<div class="square-box">
+<h1 id="labweek3"><strong>Lab Week 3</strong></h1>
+</div>
+&nbsp;
+
+You are required to build a web application that represents a bookstore management system.
+
+Specifications are:
+<ol>
+ 	<li>The database is implemented as an array of items (books)</li>
+ 	<li>It uses Express.js as a middleware</li>
+ 	<li>Each item (book) has five attributes: id, title, author, topic,cost</li>
+ 	<li>the id for the new items is auto-generated.
+<ul>
+ 	<li>HINT: use Math.random() method.</li>
+ 	<li>Example: let newId= Math.round(Math.random()*1000)</li>
+</ul>
+</li>
+ 	<li>it offers the following operations:
+<ol style="list-style-type: lower-alpha;">
+ 	<li>add a new book to the bookstore through the URL.
+<ul>
+ 	<li>E.g: http://localhost:8080/addbook?title=Harry Potter&amp;author= J. K. Rowling&amp;topic=fiction&amp;cost=15</li>
+ 	<li>Object {id:789, author:'J. K. Rowling', topic:'fiction',cost:15} should be saved in the database</li>
+</ul>
+</li>
+ 	<li>List all books
+<ul>
+ 	<li>The output should have five columns: id, title, author, topic, cost
+<ul>
+ 	<li>HINT: use function <strong>generateList</strong> as a reference</li>
+ 	<li>URL: http://localhost:8080/getallbooks</li>
+</ul>
+</li>
+</ul>
+</li>
+ 	<li>delete a book by id
+<ul>
+ 	<li>URL: http://localhost:8080/deleteid/938, where 938 is the id of the book that should be deleted</li>
+</ul>
+</li>
+ 	<li>get bookstore total value:
+<ul>
+ 	<li>URL: http://localhost:8080/getbookstorevalue</li>
+ 	<li>where the bookstore value is equal to [latex] \sum_0^n book.cost[/latex] for all n items in the array DB</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+&nbsp;
+
+<span style="text-decoration: underline;"><strong>Bonus:  use express.Router() to separate the routes in a different file.</strong></span>
+<h2></h2>
+<h2>References:</h2>
+<ul>
+ 	<li>Book: Web Development with MongoDB and Node.js</li>
+ 	<li>Book: Node.js Blueprints</li>
+ 	<li><a href="https://expressjs.com">https://expressjs.com</a></li>
+ 	<li><a href="https://searchmicroservices.techtarget.com/definition/RESTful-API">https://searchmicroservices.techtarget.com/definition/RESTful-API</a></li>
+ 	<li><a href="http://ejs.co/">http://ejs.co/</a></li>
+ 	<li><a href="https://expressjs.com/en/guide/routing.html">https://expressjs.com/en/guide/routing.html</a></li>
+</ul>
+&nbsp;
